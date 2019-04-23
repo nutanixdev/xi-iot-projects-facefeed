@@ -1,3 +1,11 @@
+.. title:: Xi IoT - Facefeed Application Deployment Guide
+
+.. toctree::
+  :maxdepth: 2
+  :caption: Nutanix Xi IoT
+  :name: _nutanix_xiiot
+  :hidden:
+
 .. _xi_iot:
 
 ------
