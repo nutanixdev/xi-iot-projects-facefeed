@@ -2,112 +2,40 @@
 
 .. toctree::
   :maxdepth: 2
-  :caption: Nutanix Xi IoT
-  :name: _nutanix_xiiot
+  :caption:     Contents
   :hidden:
+
+  index
 
 .. _xi_iot:
 
 ------
-Xi IoT
+Xi IoT - Facefeed Application Deployment Guide
 ------
 
-Overview
+Xi IoT Overview
 ++++++++
 
 The Nutanix Xi IoT platform delivers local compute and AI for IoT edge devices, converging the edge and cloud into one seamless data processing platform.
 The Xi IoT platform eliminates complexity, accelerates deployments, and elevates developers to focus on the business logic powering IoT applications and services.
 Now developers can use a low-code development platform to create application software via APIs instead of arduous programming methods.
 
-**In this lab you’ll deploy an application called “Facefeed” using the Xi IoT SaaS control plane.
-The application and its data pipelines are deployed to a virtual Xi Edge device running as a virtual machine on your local cluster.
+**In this tutorial you’ll deploy an application called “Facefeed” using the Xi IoT SaaS control plane.
+The application and its data pipelines are deployed to a Xi Edge running in Xi Cloud.
 This application ingests a video stream using the real time streaming protocol (RTSP), and uses machine learning to detect known faces.**
 
 Accessing Xi IoT
 ++++++++++++++++
 
-#. Open https://iot.nutanix.com/ in your browser to access to Xi IoT SaaS control plane.
+#. Open https://my.nutanix.com/ in your browser. If you don't already have a My Nutanix account, follow steps to create one.
 
-#. Click **Log in with My Nutanix** and provide your **my.nutanix.com** credentials.
+#. Scroll to the Xi Cloud Services section and click Launch or Start Trial to access to Xi IoT SaaS control plane.
 
-   .. note::
+   .. figure:: images/my_nutanix_xi_iot_login.png
 
-     These are the same credentials used to access the Nutanix Support Portal.
-
-   At this point you should have a dashboard with a default User (you), Project, and Category.
+   At this point you should have a dashboard with a default User (you), Project, Category. If you started a free trial, you should also have a Xi Cloud based Edge, and several sample applications.
 
    .. figure:: images/1.png
-
-Lab Setup
-+++++++++
-
-Deploy Xi Edge
-..............
-
-In this exercise you will deploy virtual Xi Edge.
-
-The Xi Edge OS was written from the ground up to efficiently run edge applications. At a high level, it consists of a Linux OS and Kubernetes cluster capable of natively running functions written in several software languages and Applications (containers) deployed via a standard Kubernetes yaml definition.
-
-Xi Edge can be deployed as a virtual machine on AHV and ESXi, or bare metal on specialized server hardware when required.
-
-#. In **Prism Central**, select :fa:`bars` **> Virtual Infrastructure > VMs**.
-
-   .. figure:: images/2.png
-
-#. Click **Create VM**.
-
-#. Fill out the following fields:
-
-   - **Name** - *Initials*\ -Edge
-   - **Description** - (Optional) Description for your VM.
-   - **vCPU(s)** - 8
-   - **Number of Cores per vCPU** - 1
-   - **Memory** - 20 GiB
-
-   - Select **+ Add New Disk**
-       - **Type** - DISK
-       - **Operation** - Clone from Image Service
-       - **Image** - sherlock-k8s-base-image_VERSION.qcow2
-       - Select **Add**
-
-   - Select **Add New NIC**
-       - **VLAN Name** - Secondary
-       - Select **Add**
-   - Select **Custom Script**
-   - Select **Type or Paste Script**
-
-   .. code-block:: bash
-     :caption: Paste this script
-
-     #cloud-config
-     final_message: "cloud-config completed"
-
-#. Click **Save** to create the VM.
-
-#. Select your Edge VM and click **Power On**.
-
-#. Once the VM has booted, open \http://*EDGE-VM-IP:8080*/v1/sn in a new browser tab to determine the serial number of the appliance. Record this value as it will be required to onboard the appliance.
-
-#. Return to the **Xi IoT** management portal and select :fa:`bars` **> Infrastructure > Edges > + Add Edge**.
-
-#. Fill out the following fields and click **Add** to begin onboarding:
-
-   - **Name** - *Initials*-edge
-   - **Serial Number** - *Copy/paste from previous step, must be in ALL CAPS*
-   - **IP Address** - *Edge VM IP Address*
-   - **Subnet Mask** - 255.255.255.128
-   - **Gateway** - 10.XX.YY.129
-   - **Category** - Leave blank for now (more on those later)
-
-   .. figure:: images/3.png
-
-   The dot next to the Xi Edge's **Name** indicates status. A grey dot indicated the Edge is either powered off or not connected. A green dot indicates the Edge is powered on and connected.
-
-   .. note::
-
-     The dashboard can take a few minutes to update once the Edge is added. Wait approximately 3 minutes then refresh the page. You should expect the status of the Edge to appear green.
-
-   .. figure:: images/4.png
 
 Download App Files
 ..................
@@ -122,14 +50,14 @@ The Facefeed application utilizes five Functions within two Data Pipelines to tr
 
 #. Open https://github.com/nutanix/xi-iot in a new browser tab and click **Clone or download > Download ZIP**.
 
-#. Extract the .zip file to a directory. These are required when referencing .yaml and .py files later in this lab.
+#. Extract the .zip file to a directory. These are required when referencing .yaml and .py files later in this tutorial.
 
 Defining Categories
 +++++++++++++++++++
 
 In Xi IoT, categories help you assign various attributes to edges and data sources which can be further used to query and select them when creating Data Pipelines or deploying Applications.
 
-An example of a category could be “City” with values in [San Francisco, San Jose, San Diego] or “State” with values in [California, Washington, Oregon] and so on. It can be anything meaningful to your environment. For this lab, we’ll categorize types of cameras by their function.
+An example of a category could be “City” with values in [San Francisco, San Jose, San Diego] or “State” with values in [California, Washington, Oregon] and so on. It can be anything meaningful to your environment. For this tutorial, we’ll categorize types of cameras by their function.
 
 #. From the **Xi IoT** management portal, select :fa:`bars` **> Infrastructure > Categories**.
 
@@ -155,7 +83,7 @@ Creating a Project
 
 In Xi IoT, Projects are used to segment resources such as applications and edges so that only assigned users can view and modify them. This allows different departments or teams to utilize shared data sources, edges, or cloud resources without interfering with each other.
 
-As part of this lab, you’ll create a new Project to deploy your sample Data Pipelines and Applications.
+As part of this tutorial, you’ll create a new Project to deploy your sample Data Pipelines and Applications.
 
 #. From the **Xi IoT** management portal, select :fa:`bars` **> Projects > + Create**.
 
@@ -170,9 +98,9 @@ As part of this lab, you’ll create a new Project to deploy your sample Data Pi
 
 #. Click **+ Add Edges** and select your Edge.
 
-   Xi IoT has the ability to natively output Data Pipelines from the edge to several public cloud services such as AWS S3, or GCP Cloud Datastore. For this lab, Cloud Profile Selection can be left blank because no cloud resources will be used.
+   Xi IoT has the ability to natively output Data Pipelines from the edge to several public cloud services such as AWS S3, or GCP Cloud Datastore. For this tutorial, Cloud Profile Selection can be left blank because no cloud resources will be used.
 
-   Xi IoT can also natively run Applications (Docker containers) at the edge using Kubernetes formated yaml as the only required input. Each yaml definition refers to a container image stored in a public or private registry. Private registries can be accessed by creating a Xi IoT Container Registry Profile to store required access information. Because this lab utilizes containers hosted in a public registry, Container Registry Selection can be left blank.
+   Xi IoT can also natively run Applications (Docker containers) at the edge using Kubernetes formated yaml as the only required input. Each yaml definition refers to a container image stored in a public or private registry. Private registries can be accessed by creating a Xi IoT Container Registry Profile to store required access information. Because this tutorial utilizes containers hosted in a public registry, Container Registry Selection can be left blank.
 
    .. figure:: images/7.png
 
@@ -181,12 +109,12 @@ As part of this lab, you’ll create a new Project to deploy your sample Data Pi
 Staging Source Data
 +++++++++++++++++++
 
-The lab depends on the availability of a video stream from which to identify faces.
+The tutorial depends on the availability of a video stream from which to identify faces.
 
 Xi IoT supports direct ingest of RTSP (commonly used in retail/security) and GigE Vision (commonly used in manufacturing/industrial) video streaming protocols, as well as `MQTT <http://mqtt.org/>`_ messaging protocol (commonly used by IoT sensor devices). For other industry specific protocols, numerous hardware & software “gateways” exist to translate those data formats & protocols into MQTT.
 
-Outside of a lab environment, these video streams would likely originate on a camera or network video recorder external to the Edge device.
-However, for the purposes of the lab, we can leverage Xi IoT's **Application** construct to deploy a pre-configured containerized application hosting an `RTSP video stream <https://hub.docker.com/r/xiiot/facefeed-rtsp-sample>`_ running directly on your Edge VM.
+Outside of a tutorial environment, these video streams would likely originate on a camera or network video recorder external to the Edge device.
+However, for the purposes of the tutorial, we can leverage Xi IoT's **Application** construct to deploy a pre-configured containerized application hosting an `RTSP video stream <https://hub.docker.com/r/xiiot/facefeed-rtsp-sample>`_ running directly on your Edge VM.
 
 As mentioned above, Xi IoT Applications are simply Docker containers that can be deployed to the edge using Kubernetes formated yaml as the only required input.
 This is considered Containers-as-a-Service (CaaS) functionality and is sold as a specific Xi IoT service SKU.
@@ -201,7 +129,7 @@ Deploying RTSP Sample Feed Application
    - **Name** - facefeed-rtsp-samples
    - **Description** - Optional
    - Select **+ Add Edges**
-   - Select your *Initials*\ **-edge** Edge
+   - Select your Edge
 
    .. figure:: images/13.png
 
@@ -226,16 +154,20 @@ Deploying RTSP Sample Feed Application
 Adding RTSP Sample Feed as a Data Source
 ........................................
 
+#. From the **Xi IoT** management portal, select :fa:`bars` **> Infrastructure > Edges**.
+
+#. Record your Edge IP address. You'll need this in the next step.
+
 #. From the **Xi IoT** management portal, select :fa:`bars` **> Infrastructure > Data Sources > + Add Data Source**.
 
 #. Fill out the following fields and click **Next**:
 
    - **Type** - Sensor
    - **Name** - rtsp-sample-feed
-   - **Associated Edge** - *Initials*-edge
+   - **Associated Edge** - your Edge
    - **Protocol** - RTSP
    - **Authentication Type** - Username and Password
-   - **IP Address** - *Edge VM IP Address*
+   - **IP Address** - your Edge IP address recorded earlier
    - **Username** - *Found in facefeed-rtsp-sample.yaml*
    - **Password** - *Found in facefeed-rtsp-sample.yaml*
 
@@ -247,12 +179,7 @@ Adding RTSP Sample Feed as a Data Source
 
    - **Name** - VideoFeed
    - **RTSP URL** - live.sdp
-
-   .. note::
-
-     The full RTSP URL is the address where the stream can be accessed, and may vary depending on camera/configuration. You can use a media player such as `VLC <https://www.videolan.org/vlc/>`_ that supports RTSP streams to access the video stream.
-
-     .. figure:: images/19.png
+   
 
 #. Click :fa:`check` to add the data extraction field.
 
@@ -320,7 +247,7 @@ This Data Pipeline will source the frames from a local webcam or uploaded image 
 
    .. note::
 
-     Use the exact **Pipeline** and **Endpoint** Names used in the lab guide, as the Endpoint name is used as the name of the Elasticsearch index on the edge. The application that you will deploy to leverage these pipelines is hardcoded to look for these specific index names within the local Elasticsearch instance.
+     Use the exact **Pipeline** and **Endpoint** Names used in this guide, as the Endpoint name is used as the name of the Elasticsearch index on the edge. The application that you will deploy to leverage these pipelines is hardcoded to look for these specific index names within the local Elasticsearch instance.
 
    - **Data Pipeline Name** - faceregister
    - Select **+ Add Data Source > Data Source**
@@ -351,7 +278,7 @@ The containerized UI application you’ll deploy will show the known vs unknown 
 
    .. note::
 
-     Use the exact **Pipeline** and **Endpoint** Names used in the lab guide.
+     Use the exact **Pipeline** and **Endpoint** Names used in this guide.
 
    - **Data Pipeline Name** - facerecognitionlivefeed
    - Select **+ Add Data Source > Data Source**
@@ -375,7 +302,7 @@ The containerized UI application you’ll deploy will show the known vs unknown 
 
    At this point, your Data Sources, Functions, and Data Pipelines are all configured and automatically deployed by Xi IoT onto your edge based on your earlier Edge assignment within the Facefeed Project.
 
-   In this lab you’re outputting Data Pipeline results to an Elasticsearch instance hosted on your edge, but Xi IoT has native capability to output in many ways.
+   In this tutorial you’re outputting Data Pipeline results to an Elasticsearch instance hosted on your edge, but Xi IoT has native capability to output in many ways.
    From the Destination dropdown you’ll notice the ability to output to your edge, or to a cloud.
 
    Here’s a breakdown of options and typical use cases:
@@ -451,7 +378,7 @@ It provides the GUI used to upload images to be analyzed by the **faceregister**
    Congratulations! You've successfully deployed a facial recognition application to your edge from Xi IoT.
    This base application could be modified for use in retail, banking, municipalities and more. Xi IoT would then make it simple to manage the deployment and monitoring of both the edge servers as well as the applications and data residing on them.
 
-   This lab is but one edge application example. Xi IoT has already been deployed by customers to:
+   This tutorial is but one edge application example. Xi IoT has already been deployed by customers to:
 
    - Identify objects on a manufacturing assembly line and control a robot to remove unsanctioned objects automatically.
    - Collect multiple parameters from various sensors on a manufacturing assembly line, correlate them, and send aggregated data to the cloud.
