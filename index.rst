@@ -20,20 +20,20 @@ The Nutanix Xi IoT platform delivers local compute and AI for IoT edge devices, 
 The Xi IoT platform eliminates complexity, accelerates deployments, and elevates developers to focus on the business logic powering IoT applications and services.
 Now developers can use a low-code development platform to create application software via APIs instead of arduous programming methods.
 
-**In this tutorial you’ll deploy an application called “Facefeed” using the Xi IoT SaaS control plane.
-The application and its data pipelines are deployed to a Xi Edge running in Xi Cloud.
-This application ingests a video stream using the real time streaming protocol (RTSP), and uses machine learning to detect known faces.**
+In this tutorial you’ll deploy an application called “Facefeed” using the Xi IoT SaaS control plane. This application ingests a video stream using the real time streaming protocol (RTSP), and uses machine learning to detect known faces.
+The application and its data pipelines are deployed to a Xi Edge device for local execution. This tutorial assumes your edge has already been deployed using steps
+from the `Xi IoT Infrastructure Admin Guide <https://portal.nutanix.com/#/page/docs/details?targetId=Xi-IoT-Infra-Admin-Guide:Xi-IoT-Infra-Admin-Guide>`_. Access to the Admin Guide is provided via the My Nutanix Portal and requires an account to login.
 
 Accessing Xi IoT
 ++++++++++++++++
 
 #. Open https://my.nutanix.com/ in your browser. If you don't already have a My Nutanix account, follow steps to create one.
 
-#. Scroll to the Xi Cloud Services section and click Launch or Start Trial to access to Xi IoT SaaS control plane.
+#. Scroll to the Xi Cloud Services section and click Launch to access the Xi IoT SaaS control plane.
 
    .. figure:: images/my_nutanix_xi_iot_login.png
 
-   At this point you should have a dashboard with a default User (you), Project, Category. If you started a free trial, you should also have a Xi Cloud based Edge, and several sample applications.
+   At this point you should have a dashboard with a default User (you), Project, Category.
 
    .. figure:: images/1.png
 
