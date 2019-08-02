@@ -47,10 +47,11 @@ The Facefeed application utilizes five Functions within two Data Pipelines to tr
 - **facematch.py** - Matches inference results to database of registered faces.
 - **facerecognition.py** - Uses a TensorFlow machine learning model to draw inference.
 - **raw_to_jpeg.py** - Converts the raw binary stream into a readable image format.
+- **es_datamover.go - Streams output into a local Elasticsearch instance for later recall.
 
 #. Open https://github.com/nutanix/xi-iot in a new browser tab and click **Clone or download > Download ZIP**.
 
-#. Extract the .zip file to a directory. These are required when referencing .yaml and .py files later in this tutorial.
+#. Extract the .zip file to a directory. These are required when referencing .yaml, .py, and .go files later in this tutorial.
 
 Defining Categories
 +++++++++++++++++++
@@ -223,8 +224,17 @@ This allows developers to re-use existing code, or quickly write new logic utili
 
 #. Click **Create**.
 
-#. Repeat Steps 1-5 to add the remaining 4 functions. The **Name** should follow the script name (without .py).
+#. Repeat Steps 1-5 to add the remaining four .py python functions. The **Name** should follow the script name (without .py). 
 
+#. Repeat Steps 1-4 once more to add the es_datamover.go function. Note that the Language and Runtime Environment should be golang, and Golang Env. 
+  
+   Before clicking Create, click **+ Add parameter** in the left pane.
+   Enter **esIndex** in the Name field.
+   Select **string** form the Type dropdown.
+   Click the :fa:`check` to save the parameter.
+
+#. Click **Create**.
+   
    Once completed, your environment should match the image below:
 
    .. figure:: images/10.png
@@ -256,8 +266,11 @@ This Data Pipeline will source the frames from a local webcam or uploaded image 
    - Select **+ Add Function > facerecognition**
    - Select :fa:`plus-circle` to add an additional function
    - Select **face_register**
-   - Select **+ Add Destination > Edge**
-   - **Endpoint Type** - Elasticsearch
+   - Select :fa:`plus-circle` to add an additional function
+   - Select **es_datamover**
+   - Type **datastream-face_register** in the esIndex (string) field.
+   - Select **+ Add Destination > Infrastructure**
+   - **Endpoint Type** - Realtime Data Stream
    - **Endpoint Name** - datastream-faceregister
 
    .. figure:: images/11.png
@@ -292,8 +305,11 @@ The containerized UI application you’ll deploy will show the known vs unknown 
    - Select **facematch**
    - Select :fa:`plus-circle` to add an additional function
    - Select **aggregatefeed**
-   - Select **+ Add Destination > Edge**
-   - **Endpoint Type** - Elasticsearch
+   - Select :fa:`plus-circle` to add an additional function
+   - Select **es_datamover**
+   - Type **datastream-facerecognitionlivefeed** in the esIndex (string) field.
+   - Select **+ Add Destination > Infrastructure**
+   - **Endpoint Type** - Realtime Data Stream
    - **Endpoint Name** - datastream-facerecognitionlivefeed
 
    .. figure:: images/12.png
@@ -307,9 +323,8 @@ The containerized UI application you’ll deploy will show the known vs unknown 
 
    Here’s a breakdown of options and typical use cases:
 
-   - **Edge**
+   - **Infrastructure**
        - **Kafka** - real-time streaming between edge local applications
-       - **Elasticsearch** - search and analytics database (NoSQL) for temporary data sharing between edge local applications
        - **MQTT** - real-time streaming devices (actuators or other edge devices)
        - **Realtime Data Stream** - real-time streaming between Xi IoT Data Pipelines
    - **Cloud**
